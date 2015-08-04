@@ -7,6 +7,13 @@ http://gruntjs.com/sample-gruntfile
 module.exports = function(grunt) {
   // Initialize configuration object
   grunt.initConfig({
+    // grunt seems to have a logging function
+    log: {
+      foo: [1,2,3],
+      bar: 'hello world',
+      baz: false
+    },
+
     // read project settings from package.json, so we can refer to it later
     pkg: grunt.file.readJSON('package.json')
 
@@ -32,7 +39,7 @@ module.exports = function(grunt) {
         all files that exist within src/ and end in .js.
         */
       }
-    } // end concat
+    }, // end concat
 
     uglify: {
       options: {
@@ -45,7 +52,7 @@ module.exports = function(grunt) {
         // that concat produces
         'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
       }
-    } // end uglify
+    }, // end uglify
 
     qunit: {
       // QUnit just needs the location of the test runner files
@@ -64,7 +71,7 @@ module.exports = function(grunt) {
           module: true
         }
       }
-    } // end jshint
+    }, // end jshint
 
     watch: {
       // this uses the same files that jshint is checking
@@ -72,20 +79,28 @@ module.exports = function(grunt) {
       // it runs these tasks in the order that they are listed
       tasks: ['jshint', 'qunit']
     } // end watch
+  }); // end config
 
-    // We load the Grunt plugins we need. These should be install
-    // through npm
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-qunit');
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-concat');
+  // We load the Grunt plugins we need. These should be install
+  // through npm Note that this is outside config
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-concat');
 
-    // sets up the tasks for the cli. The most important is the default
-    // this would be run by typing "grunt test" on the command line
-    grunt.registerTask('test', ['jshint', 'qunit']);
-    // the default task can be run just by typing "grunt" on the command line
-    grunt.registerTask('default', ['jshint', 'qunit', 'concat', 'uglify']);
-
-  }) // end config
+  // sets up the tasks for the cli. The most important is the default
+  // this would be run by typing "grunt test" on the command line
+  grunt.registerTask('test', ['jshint', 'qunit']);
+  // the default task can be run just by typing "grunt" on the command line
+  grunt.registerTask('default', ['jshint', 'qunit', 'concat', 'uglify']);
+  // this runs the tasks with "dist" as an argument
+  grunt.registerTask('dist', ['concat:dist', 'uglify:dist']);
+  /**
+  Multi tasks can be run with grunt.registerMultiTask(taskName, [description, ] taskFunction)
+  Most "grunt-contrib" modules are multi-task
+  */
+  grunt.registerMultiTask('log', 'Log Stuff', function() {
+    grunt.log.writeln(this.target + ': ' + this.data);
+  });
 } // end module.exports
